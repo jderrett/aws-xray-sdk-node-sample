@@ -17,4 +17,4 @@ tasks:
   # Run xray daemon
   - name: AWS XRay Daemon
     init: gp sync-await xray
-    command: cd ../xray-install-files && ./xray
+    command: cd ../xray-install-files && xray
