@@ -14,6 +14,7 @@ tasks:
       sudo apt-get install ./aws-xray-daemon-3.x.deb
       cd $GITPOD_REPO_ROOT
       gp sync-done xray
+    command: node index.js
   # Run xray daemon
   # Config lives in /etc/amazon/xray/cfg.yaml
   - name: AWS XRay Daemon
