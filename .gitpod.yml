@@ -15,6 +15,15 @@ tasks:
       cd $GITPOD_REPO_ROOT
       gp sync-done xray
   # Run xray daemon
+  # Config lives in /etc/amazon/xray/cfg.yaml
   - name: AWS XRay Daemon
     init: gp sync-await xray
-    command: cd ../xray-install-files && xray
+    command: |
+      cd ../xray-install-files
+      xray -o # skip EC2 check
+
+ports:
+  - port: 2000
+    onOpen: ignore
+  - port: 3000
+    onOpen: open-browser
