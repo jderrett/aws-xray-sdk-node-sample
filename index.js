@@ -11,7 +11,7 @@ AWSXRay.captureHTTPsGlobal(require('https'));
 const https = require('https');
 
 // Capture MySQL queries
-const mysql = AWSXRay.captureMySQL(require('mysql'));
+// const mysql = AWSXRay.captureMySQL(require('mysql'));
 
 const app = express();
 const port = 3000;
@@ -20,11 +20,15 @@ app.use(XRayExpress.openSegment('SampleSite'));
 
 app.get('/', (req, res) => {
   const seg = AWSXRay.getSegment();
-  const sub = seg.addNewSubsegment('customSubsegment');
+  const sub1 = seg.addNewSubsegment('subsegment1');
   setTimeout(() => {
-    sub.close();
-    res.sendFile(`${process.cwd()}/index.html`);
-  }, 500);
+    sub1.close();
+    const sub2 = seg.addNewSubsegment('subsegment2');
+    setTimeout(() => {
+      sub2.close();
+      res.sendFile(`${process.cwd()}/index.html`);
+    }, 200);
+  }, 300);
 });
 
 app.get('/aws-sdk/', (req, res) => {
@@ -53,27 +57,43 @@ app.get('/http-request/', (req, res) => {
   });
 });
 
-app.get('/mysql/', (req, res) => {
-  const mysqlConfig = require('./mysql-config.json');
-  const config = mysqlConfig.config;
-  const table = mysqlConfig.table;
 
-  if (!config.user || !config.database || !config.password || !config.host || !table) {
-    res.send('Please correctly populate mysql-config.json');
-    return;
-  }
+app.get('/aws/', (req, res) => {
+  const endpoint = 'https://aws.amazon.com/';
+  https.get(endpoint, (response) => {
+    response.on('data', () => {});
 
-  const connection = mysql.createConnection(config);
-  connection.query(`SELECT * FROM ${table}`, (err, results, fields) => {
-    if (err) {
-      res.send(`Encountered error while querying ${table}: ${err}`);
-      return;
-    }
-    res.send(`Retrieved the following results from ${table}:\n${results}`);
+    response.on('error', (err) => {
+      res.send(`Encountered error while making HTTPS request: ${err}`);
+    });
+
+    response.on('end', () => {
+      res.send(`Successfully reached ${endpoint}.`);
+    });
   });
-
-  connection.end();
 });
+
+// app.get('/mysql/', (req, res) => {
+//   const mysqlConfig = require('./mysql-config.json');
+//   const config = mysqlConfig.config;
+//   const table = mysqlConfig.table;
+
+//   if (!config.user || !config.database || !config.password || !config.host || !table) {
+//     res.send('Please correctly populate mysql-config.json');
+//     return;
+//   }
+
+//   const connection = mysql.createConnection(config);
+//   connection.query(`SELECT * FROM ${table}`, (err, results, fields) => {
+//     if (err) {
+//       res.send(`Encountered error while querying ${table}: ${err}`);
+//       return;
+//     }
+//     res.send(`Retrieved the following results from ${table}:\n${results}`);
+//   });
+
+//   connection.end();
+// });
 
 app.use(XRayExpress.closeSegment());
 
