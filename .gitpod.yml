@@ -6,21 +6,21 @@
 
 tasks:
   # Install AWS Xray daemon
-  - name: Dev Server
+  - name: Node Server
     init: |
       npm install
-      cd .. && mkdir xray-install-files && cd xray-install-files
+      mkdir ../xray-install-files && cd $_
       wget https://s3.us-east-2.amazonaws.com/aws-xray-assets.us-east-2/xray-daemon/aws-xray-daemon-3.x.deb
-      sudo apt-get install ./aws-xray-daemon-3.x.deb
       cd $GITPOD_REPO_ROOT
-      gp sync-done xray
+      gp sync-done xraydownload
     command: node index.js
-  # Run xray daemon
+  # Install xray daemon every time because /usr/bin/xray gets wiped
   # Config lives in /etc/amazon/xray/cfg.yaml
   - name: AWS XRay Daemon
-    init: gp sync-await xray
+    init: gp sync-await xraydownload
     command: |
       cd ../xray-install-files
+      sudo apt-get install ./aws-xray-daemon-3.x.deb
       xray -o # skip EC2 check
 
 ports:
