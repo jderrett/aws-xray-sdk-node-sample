@@ -31,16 +31,16 @@ app.get('/', (req, res) => {
   }, 300);
 });
 
-app.get('/aws-sdk/', (req, res) => {
-  const ddb = new AWS.DynamoDB();
-  const ddbPromise = ddb.listTables().promise();
+// app.get('/aws-sdk/', (req, res) => {
+//   const ddb = new AWS.DynamoDB();
+//   const ddbPromise = ddb.listTables().promise();
 
-  ddbPromise.then(function(data) {
-    res.send(`ListTables result:\n ${JSON.stringify(data)}`);
-  }).catch(function(err) {
-    res.send(`Encountered error while calling ListTables: ${err}`);
-  });
-});
+//   ddbPromise.then(function(data) {
+//     res.send(`ListTables result:\n ${JSON.stringify(data)}`);
+//   }).catch(function(err) {
+//     res.send(`Encountered error while calling ListTables: ${err}`);
+//   });
+// });
 
 app.get('/http-request/', (req, res) => {
   const endpoint = 'https://amazon.com/';
