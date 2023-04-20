@@ -59,15 +59,20 @@ app.get('/http-request/', (req, res) => {
 
 
 app.get('/aws/', (req, res) => {
+  const seg = AWSXRay.getSegment();
+
+  const sub1 = seg.addNewSubsegment('getAWS');
   const endpoint = 'https://aws.amazon.com/';
   https.get(endpoint, (response) => {
-    response.on('data', () => {});
+    response.on('data', () => {
+    });
 
     response.on('error', (err) => {
       res.send(`Encountered error while making HTTPS request: ${err}`);
     });
 
     response.on('end', () => {
+      sub1.close();
       res.send(`Successfully reached ${endpoint}.`);
     });
   });
